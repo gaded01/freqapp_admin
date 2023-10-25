@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 
 // material-ui
-import { Box, Chip, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 
 // project import
 import MainCard from 'components/MainCard';
 
 // assets
-import { RiseOutlined, FallOutlined } from '@ant-design/icons';
+// import { RiseOutlined, FallOutlined } from '@ant-design/icons';
 
 // ==============================|| STATISTICS - ECOMMERCE CARD  ||============================== //
 
-const AnalyticEcommerce = ({ color, title, count, percentage, isLoss, extra }) => (
+const AnalyticEcommerce = ({ title, count }) => (
   <MainCard contentSX={{ p: 2.25 }}>
     <Stack spacing={0.5}>
       <Typography variant="h6" color="textSecondary">
@@ -23,7 +23,7 @@ const AnalyticEcommerce = ({ color, title, count, percentage, isLoss, extra }) =
             {count}
           </Typography>
         </Grid>
-        {percentage && (
+        {/* {percentage && (
           <Grid item>
             <Chip
               variant="combined"
@@ -39,17 +39,17 @@ const AnalyticEcommerce = ({ color, title, count, percentage, isLoss, extra }) =
               size="small"
             />
           </Grid>
-        )}
+        )} */}
       </Grid>
     </Stack>
     <Box sx={{ pt: 2.25 }}>
-      <Typography variant="caption" color="textSecondary">
+      {/* <Typography variant="caption" color="textSecondary">
         You made an extra{' '}
         <Typography component="span" variant="caption" sx={{ color: `${color || 'primary'}.main` }}>
           {extra}
         </Typography>{' '}
         this year
-      </Typography>
+      </Typography> */}
     </Box>
   </MainCard>
 );

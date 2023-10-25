@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // material-ui
 import {
@@ -21,20 +21,22 @@ import {
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-
+import axios from 'axios';
 // project import
 import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
-
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { useUserContext } from 'context/UserContext';
+import RedirectToHome from 'middleware/RedirecToHome';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
-
   const [showPassword, setShowPassword] = React.useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useUserContext()
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -42,23 +44,54 @@ const AuthLogin = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+        navigate('/dashboard')
+    };
+  },[])
+
+  const submitLogin = (values) => {
+    // setLoading(true);
+    axios.post(`${process.env.REACT_APP_BASE_API_URL}/user-login`, values)
+      .then((res) => {
+        // setLoading(false);
+        if (res.data.status !== "failed") {
+          setUser( res.data.user.id);
+          localStorage.setItem('token', res.data.access_token);
+          if(res.data.user.role == "1") {
+            navigate('/dashboard');
+          }
+          else {
+            navigation.navigate("Drawer");
+          }
+          
+        } else {
+          alert(res.data.message);
+          console.log(REACT_APP_BASE_API_URL);
+        }
+      })
+      .catch((error) => {
+        // setLoading(false);
+        console.log('erri', error);
+      });
+  };
 
   return (
     <>
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
-          submit: null
+          contact_number: '',
+          password: '',
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          contact_number: Yup.string().max(255).required('Contact number is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           try {
+            submitLogin(values)
             setStatus({ success: false });
-            setSubmitting(false);
+            setSubmitting(true);
           } catch (err) {
             setStatus({ success: false });
             setErrors({ submit: err.message });
@@ -71,21 +104,21 @@ const AuthLogin = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Email Address</InputLabel>
+                  <InputLabel htmlFor="contact_number-login">Contact Number</InputLabel>
                   <OutlinedInput
-                    id="email-login"
-                    type="email"
-                    value={values.email}
-                    name="email"
+                    id="contact_number-login"
+                    type="contact_number"
+                    value={values.contact_number}
+                    name="contact_number"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="Enter email address"
+                    placeholder="Enter contact number"
                     fullWidth
-                    error={Boolean(touched.email && errors.email)}
+                    error={Boolean(touched.contact_number && errors.contact_number)}
                   />
-                  {touched.email && errors.email && (
-                    <FormHelperText error id="standard-weight-helper-text-email-login">
-                      {errors.email}
+                  {touched.contact_number && errors.contact_number && (
+                    <FormHelperText error id="standard-weight-helper-text-contact_number-login">
+                      {errors.contact_number}
                     </FormHelperText>
                   )}
                 </Stack>
@@ -124,26 +157,6 @@ const AuthLogin = () => {
                   )}
                 </Stack>
               </Grid>
-
-              <Grid item xs={12} sx={{ mt: -1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={checked}
-                        onChange={(event) => setChecked(event.target.checked)}
-                        name="checked"
-                        color="primary"
-                        size="small"
-                      />
-                    }
-                    label={<Typography variant="h6">Keep me sign in</Typography>}
-                  />
-                  <Link variant="h6" component={RouterLink} to="" color="text.primary">
-                    Forgot Password?
-                  </Link>
-                </Stack>
-              </Grid>
               {errors.submit && (
                 <Grid item xs={12}>
                   <FormHelperText error>{errors.submit}</FormHelperText>
@@ -155,14 +168,6 @@ const AuthLogin = () => {
                     Login
                   </Button>
                 </AnimateButton>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
               </Grid>
             </Grid>
           </form>
