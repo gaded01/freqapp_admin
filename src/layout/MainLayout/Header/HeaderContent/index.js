@@ -31,8 +31,8 @@ const HeaderContent = () => {
       </IconButton> */}
 
       {/* <Notification /> */}
-      {!matchesXs && <Profile />}
-      {matchesXs && <MobileSection />}
+      {/* {!matchesXs && <Profile />} */}
+      {/* {matchesXs && <MobileSection />} */}
     </>
   );
 };

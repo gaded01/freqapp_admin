@@ -79,7 +79,7 @@ function index() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Modal title="Add Plan" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+      {/* <Modal title="Add Plan" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Formik
           initialValues={{
             month: '',
@@ -177,7 +177,7 @@ function index() {
             </form>
           )}
         </Formik>
-      </Modal>
+      </Modal> */}
     </MainCard>
   );
 }

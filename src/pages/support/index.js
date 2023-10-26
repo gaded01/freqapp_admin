@@ -17,7 +17,8 @@ import Fab from '@mui/material/Fab';
 import {
   SendOutlined
 } from '@ant-design/icons';
-import { Button, Modal,Spin, Tag, Badge } from 'antd';
+import { Button, Modal,Spin, Tag, Badge} from 'antd';
+import message from 'assets/images/users/message.png';
 
 const useStyles = makeStyles({
   table: {
@@ -211,8 +212,14 @@ function index() {
                           </ListItem>
                       )) 
                     :
-                    <Spin/> 
+                    <Grid container sx={{alignItems: "center", justifyContent: "center", height: 'inherit'}}>
+                      <Grid item sx={{textAlign: "center"}}>
+                        <Spin/>
+                        <Typography>Inbox is empty. Kindly select a user</Typography>
+                      </Grid>
+                    </Grid>
                   
+                 
                   }
                   
                 </List>

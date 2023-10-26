@@ -11,7 +11,7 @@ const Bill = Loadable(lazy(() => import('pages/bills')));
 const Plan = Loadable(lazy(() => import('pages/plan')));
 const Support = Loadable(lazy(() => import('pages/support')));
 const Information = Loadable(lazy(() => import('pages/information')));
-// const Logout = Loadable(lazy(() => import('pages/logout')));
+const Logout = Loadable(lazy(() => import('pages/logout')));
 
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
@@ -58,10 +58,10 @@ const MainRoutes = {
           path: '/information',
           element: <Information />
         },
-        // {
-        //   path: '/logout',
-        //   element: <Logout />
-        // },
+        {
+          path: '/logout',
+          element: <Logout />
+        },
         {
           path: 'color',
           element: <Color />

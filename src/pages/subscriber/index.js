@@ -141,7 +141,7 @@ function index() {
         </Table>
       </TableContainer>
      
-      <Pagination sx={{paddingTop: "1rem"}} count={10} variant="outlined" shape="rounded" />
+      {/* <Pagination sx={{paddingTop: "1rem"}} count={10} variant="outlined" shape="rounded" /> */}
     
       <Modal title="Add Subscriber" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
         <Formik
