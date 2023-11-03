@@ -1,77 +1,102 @@
-// import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-// material-ui
+//material-ui
 import {
-  // Avatar,
-  // AvatarGroup,
-  // Box,
-  // Button,
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
   Grid,
-  // List,
-  // ListItemAvatar,
-  // ListItemButton,
-  // ListItemSecondaryAction,
-  // ListItemText,
-  // MenuItem,
-  // Stack,
-  // TextField,
+  List,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemSecondaryAction,
+  ListItemText,
+  MenuItem,
+  Stack,
+  TextField,
   Typography
 } from '@mui/material';
 
 // project import
-// import OrdersTable from './OrdersTable';
-// import IncomeAreaChart from './IncomeAreaChart';
-// import MonthlyBarChart from './MonthlyBarChart';
-// import ReportAreaChart from './ReportAreaChart';
-// import SalesColumnChart from './SalesColumnChart';
-// import MainCard from 'components/MainCard';
+import OrdersTable from './OrdersTable';
+import IncomeAreaChart from './IncomeAreaChart';
+import MonthlyBarChart from './MonthlyBarChart';
+import ReportAreaChart from './ReportAreaChart';
+import SalesColumnChart from './SalesColumnChart';
+import MainCard from 'components/MainCard';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
 
-// assets
-// import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
-// import avatar1 from 'assets/images/users/avatar-1.png';
-// import avatar2 from 'assets/images/users/avatar-2.png';
-// import avatar3 from 'assets/images/users/avatar-3.png';
-// import avatar4 from 'assets/images/users/avatar-4.png';
+//assets
+import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
+import avatar1 from 'assets/images/users/avatar-1.png';
+import avatar2 from 'assets/images/users/avatar-2.png';
+import avatar3 from 'assets/images/users/avatar-3.png';
+import avatar4 from 'assets/images/users/avatar-4.png';
 
-// avatar style
-// const avatarSX = {
-//   width: 36,
-//   height: 36,
-//   fontSize: '1rem'
-// };
 
-// action style
-// const actionSX = {
-//   mt: 0.75,
-//   ml: 1,
-//   top: 'auto',
-//   right: 'auto',
-//   alignSelf: 'flex-start',
-//   transform: 'none'
-// };
 
-// sales report status
-// const status = [
-//   {
-//     value: 'today',
-//     label: 'Today'
-//   },
-//   {
-//     value: 'month',
-//     label: 'This Month'
-//   },
-//   {
-//     value: 'year',
-//     label: 'This Year'
-//   }
-// ];
+//avatar style
+const avatarSX = {
+  width: 36,
+  height: 36,
+  fontSize: '1rem'
+};
+
+//action style
+const actionSX = {
+  mt: 0.75,
+  ml: 1,
+  top: 'auto',
+  right: 'auto',
+  alignSelf: 'flex-start',
+  transform: 'none'
+};
+
+//sales report status
+const status = [
+  {
+    value: 'today',
+    label: 'Today'
+  },
+  {
+    value: 'month',
+    label: 'This Month'
+  },
+  {
+    value: 'year',
+    label: 'This Year'
+  }
+];
 
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
-  // const [value, setValue] = useState('today');
-  // const [slot, setSlot] = useState('week');
+  const [value, setValue] = useState('today');
+  const [slot, setSlot] = useState('month');
+  const [data , setData ] = useState({});
+  const [consumption, setConsumption] = useState([]);
+  const [income, setIncome] = useState([]);
+
+  useEffect(()=> {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .get(`${process.env.REACT_APP_BASE_API_URL}/data-consumption`, config)
+      .then((res) => {
+        if (res) {
+          console.log('data', res.data);
+          setConsumption(res.data?.data_consumption);
+          setIncome(res.data?.income);
+          setData(res.data)
+        }
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
+  },[])
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
@@ -80,27 +105,27 @@ const DashboardDefault = () => {
         <Typography variant="h5">Dashboard</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Annual Income" count="0"/>
+        <AnalyticEcommerce title="Annual Income" count={"₱ " + data?.annual_income?.amount}/>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Month Income" count="0"/>
+        <AnalyticEcommerce title="Month Income" count={"₱ " +data?.month_income?.amount}/>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Pending Bill" count="0"/>
+        <AnalyticEcommerce title="Pending Bill" count={data?.pending_income}/>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Subscriber" count="0"/>
+        <AnalyticEcommerce title="Subscriber" count={data?.subscriber}/>
       </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
+      {/* <Grid item xs={12} sm={6} md={4} lg={3}>
         <AnalyticEcommerce title="Plan Available" count="0"/>
-      </Grid>
+      </Grid> */}
       <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
 
       {/* row 2 */}
-      {/* <Grid item xs={12} md={7} lg={8}>
+      <Grid item xs={12} md={7} lg={8}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Typography variant="h5">Unique Visitor</Typography>
+            <Typography variant="h5">Average Data Usage</Typography>
           </Grid>
           <Grid item>
             <Stack direction="row" alignItems="center" spacing={0}>
@@ -112,27 +137,27 @@ const DashboardDefault = () => {
               >
                 Month
               </Button>
-              <Button
+              {/* <Button
                 size="small"
                 onClick={() => setSlot('week')}
                 color={slot === 'week' ? 'primary' : 'secondary'}
                 variant={slot === 'week' ? 'outlined' : 'text'}
               >
                 Week
-              </Button>
+              </Button> */}
             </Stack>
           </Grid>
         </Grid>
         <MainCard content={false} sx={{ mt: 1.5 }}>
           <Box sx={{ pt: 1, pr: 2 }}>
-            <IncomeAreaChart slot={slot} />
+            <IncomeAreaChart slot={slot} consumptions={consumption} />
           </Box>
         </MainCard>
       </Grid>
       <Grid item xs={12} md={5} lg={4}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Typography variant="h5">Income Overview</Typography>
+            <Typography variant="h5">Monthly Income</Typography>
           </Grid>
           <Grid item />
         </Grid>
@@ -140,14 +165,14 @@ const DashboardDefault = () => {
           <Box sx={{ p: 3, pb: 0 }}>
             <Stack spacing={2}>
               <Typography variant="h6" color="textSecondary">
-                This Week Statistics
+                This Month Income
               </Typography>
-              <Typography variant="h3">$7,650</Typography>
+              <Typography variant="h3">₱ {data?.month_income?.amount}</Typography>
             </Stack>
           </Box>
-          <MonthlyBarChart />
+          <MonthlyBarChart  incomes={income}/> 
         </MainCard>
-      </Grid> */}
+      </Grid>
 
       {/* row 3 */}
       {/* <Grid item xs={12} md={7} lg={8}>

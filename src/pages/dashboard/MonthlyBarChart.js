@@ -24,6 +24,7 @@ const barChartOptions = {
   dataLabels: {
     enabled: false
   },
+  
   xaxis: {
     categories: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
     axisBorder: {
@@ -43,25 +44,31 @@ const barChartOptions = {
 
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
-const MonthlyBarChart = () => {
+const MonthlyBarChart = ({incomes}) => {
   const theme = useTheme();
 
   const { primary, secondary } = theme.palette.text;
   const info = theme.palette.info.light;
 
-  const [series] = useState([
-    {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
-  ]);
+  const [series, setSeries] = useState([]);
 
   const [options, setOptions] = useState(barChartOptions);
+
+  useEffect(() => {
+    setSeries([
+      {
+        name: 'Month Income',
+        data:  incomes?.map((i) => i.amount),
+      }
+    ]); 
+  }, [incomes]);
 
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
       colors: [info],
       xaxis: {
+        categories: incomes?.map((i) => i.month),
         labels: {
           style: {
             colors: [secondary, secondary, secondary, secondary, secondary, secondary, secondary]
@@ -73,7 +80,7 @@ const MonthlyBarChart = () => {
       }
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [primary, info, secondary]);
+  }, [primary, info, secondary, incomes]);
 
   return (
     <div id="chart">

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useContext, useEffect } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -53,7 +53,7 @@ function a11yProps(index) {
 
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
-const Profile = () => {
+const Profile = ({ user }) => {
   const theme = useTheme();
 
   const handleLogout = async () => {
@@ -78,7 +78,6 @@ const Profile = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
   const iconBackColorOpen = 'grey.300';
 
   return (
@@ -94,14 +93,26 @@ const Profile = () => {
         ref={anchorRef}
         aria-controls={open ? 'profile-grow' : undefined}
         aria-haspopup="true"
-        onClick={handleToggle}
+        disabled={true}
+        // onClick={handleToggle}
       >
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-          <Typography variant="subtitle1">John Doe</Typography>
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ p: 0.5 }}>
+          <Avatar
+            alt={`${user.first_name}`}
+            sx={{ width: 34, height: 34 }}
+            src="https://www.flaticon.com/free-icon/user_149071?term=user+avatar&page=1&position=2&origin=tag&related_id=149071"
+          />
+          <Stack alignItems="baseline">
+            <Typography variant="subtitle1">
+              {user.first_name} {user.middle_name} {user.last_name}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {user? 'Admin': null}
+            </Typography>
+          </Stack>
         </Stack>
       </ButtonBase>
-      <Popper
+      {/* <Popper
         placement="bottom-end"
         open={open}
         anchorEl={anchorRef.current}
@@ -199,7 +210,7 @@ const Profile = () => {
             )}
           </Transitions>
         )}
-      </Popper>
+      </Popper> */}
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import MainCard from 'components/MainCard';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,45 +8,152 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import { Stack, IconButton, InputAdornment, InputLabel, OutlinedInput, FormHelperText, Select, MenuItem } from '@mui/material';
+import { Stack, IconButton, InputAdornment, InputLabel, OutlinedInput, FormHelperText, Select, MenuItem , ListItem, Alert, AlertTitle,Switch} from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { Button, Modal } from 'antd';
+import { Button, Modal ,Tag} from 'antd';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { EditOutlined, DeleteOutlined, EyeTwoTone } from '@ant-design/icons';
+
+const initialValues = {
+  mbps: '',
+  price: ''
+};
 
 function index() {
   const [open, setOpen] = React.useState(false);
   const [modalText, setModalText] = useState('Content of the modal');
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [planType, setPlanType] = useState([]);
+  const [values, setValues] = useState(initialValues);
+  const [newData, setNewData] = useState(false);
+  const [action , setAction]  = useState("Add");
+  const [exists , setExists] = useState(false);
 
   const showModal = () => {
     setOpen(true);
   };
 
-  const handleOk = () => {
-    setModalText('The modal will be closed after two seconds');
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
+  const handleChanges = (e) => {
+    const target = e.target;
+    setValues({ ...values, [target.name]: target.value });
   };
 
+  const handleOk = () => {
+    console.log(values);
+    setConfirmLoading(true);
+    let route = 'add-plan-type';
+    if(action == 'Edit') route = 'edit-plan-type';
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .post(`${process.env.REACT_APP_BASE_API_URL}/${route}`, values, config)
+      .then((res) => {
+        if(res.data.status == 'exists') {
+          setExists(true);
+        }
+        else {
+          setNewData(true);
+          setOpen(false);
+          setValues(initialValues);
+        }
+        setConfirmLoading(false);
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
+  };
+
+  useEffect(() => {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .get(`${process.env.REACT_APP_BASE_API_URL}/get-plan-type`, config)
+      .then((res) => {
+        // setLoading(false);
+        if (res) {
+          console.log(res.data);
+          setPlanType(res.data);
+          setPage(res.data.last_page);
+        } else {
+          console.log(res.data.message);
+        }
+      })
+      .catch((error) => {
+        // setLoading(false);
+        console.log('erri', error);
+      });
+  }, [newData]);
+
   const handleCancel = () => {
+    setValues(initialValues);
+    setExists(false);
+    setAction('Add');
     console.log('Clicked cancel button');
     setOpen(false);
   };
 
+  // const openDisableModal = (plan) => {
+  //   Modal.confirm({
+  //       title: 'Confirmation',
+  //       content: `Are you sure you want ${plan.status == 1 ? 'disable' : 'enable'} the ${plan.mbps} mbps plan with the price of ₱${plan.price}?`,
+  //       onOk() {disableType(plan.id)},
+  //       onCancel() {
+  //         console.log('asdasd');
+  //         setNewData(true);
+  //       },
+  //       footer: (_, { OkBtn, CancelBtn }) => (
+  //         <>
+  //           <CancelBtn />
+  //           <OkBtn/>
+  //         </>
+  //       ),
+  //   })
+  // }
 
+  const disableType = (id) =>{
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+    .post(`${process.env.REACT_APP_BASE_API_URL}/disable-plan-type`, {id : id}, config)
+    .then((res) => {
+      if (res) {
+       console.log('res', res)
+      }
+      reloadData();
+      setConfirmLoading(false);
+    })
+    .catch((error) => {
+      console.log('err', error);
+    });
 
-  function createBill(id, mbps, price) {
-    return {id, mbps, price};
   }
-  const billRows = [
-   createBill('1', '50mbps Fiber Plan', '1200'),
-   createBill('2', '50mbps Fiber Plan', '1200'),
-  ];
+  
+  const editPlan = (values) =>{
+    console.log(values);
+    setAction('Edit');
+    showModal();
+    setValues({
+      ...values,
+      id: values.id,
+      mbps: values.mbps,
+      price: values.price,
+    });
+  };
 
+  
+  const reloadData = () => {
+    if (!newData) {
+      setNewData(true);
+    } else {
+      setNewData(false);
+    }
+    setLoading(false);
+  };
   return (
     <MainCard>
       <Grid container alignItems="center" justifyContent="space-between" pb={2}>
@@ -60,26 +167,54 @@ function index() {
         <Table sx={{ minWidth: 650, paddingTop: 0 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>No.</TableCell>
               <TableCell>Plan Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell>Price (₱)</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {billRows.map((row) => (
-              <TableRow key={row.acc} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">
-                  {row.id}
-                </TableCell>
-                <TableCell>{row.mbps}</TableCell>
+            {planType.map((row) => (
+              <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell>{row.mbps} mbps plan</TableCell>
                 <TableCell>{row.price}</TableCell>
+                <TableCell>{row.status == 1 ? <Tag color="green">Available</Tag> : <Tag color="red">Unavailable</Tag>}</TableCell>
+                <TableCell align="center">
+                  {' '}
+                  <Switch
+                      onChange={() => {
+                        disableType(row.id);
+                      }}
+                      defaultChecked={row.status == 1 ? true : false}
+                  />
+                  <Button
+                    // disabled={list.status == '0' ? true : list.status == '2' ? true : false}
+                    onClick={() => editPlan(row)}
+                    type="text"
+                  >
+                    <EditOutlined style={{ fontSize: 16, color: '#1677ff' }} />
+                  </Button>
+                  {/* <Button
+                    // disabled={list.status == '0' ? true : list.status == '3' ? true : false}
+                    onClick={() => openDeleteModal(row)}
+                    type="text"
+                  >
+                    <DeleteOutlined style={{ fontSize: 16, color: '#1677ff' }} />
+                  </Button> */}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Modal title="Add Plan" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+      <Modal title={action == 'Add' ? 'Add Plan' : 'Edit Plan'} open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+        {exists? (
+            
+                  <Alert severity="error">
+                    Added plan already  <strong>exist!</strong>
+                  </Alert>
+           
+          ) : null}
         <Formik
           initialValues={{
             month: '',
@@ -103,20 +238,20 @@ function index() {
             }
           }}
         >
-          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched }) => (
             <form noValidate onSubmit={handleSubmit}>
               <Grid container spacing={1}>
                 <Grid item xs={12}>
                   <Stack spacing={1}>
-                    <InputLabel htmlFor="plan_name">Plan Name</InputLabel>
+                    <InputLabel htmlFor="mbps">Plan Mbps</InputLabel>
                     <OutlinedInput
-                      id="plan_name"
-                      type="plan_name"
-                      value={values.plan_name}
-                      name="plan_name"
+                      id="mbps"
+                      type="number"
+                      value={values.mbps}
+                      name="mbps"
                       onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter plan name"
+                      onChange={handleChanges}
+                      placeholder="Enter plan mbps"
                       fullWidth
                       error={Boolean(touched.plan_name && errors.plan_name)}
                     />
@@ -136,7 +271,7 @@ function index() {
                       value={values.price}
                       name="price"
                       onBlur={handleBlur}
-                      onChange={handleChange}
+                      onChange={handleChanges}
                       placeholder="Enter price"
                       fullWidth
                       error={Boolean(touched.price && errors.price)}
@@ -153,7 +288,6 @@ function index() {
                     <FormHelperText error>{errors.submit}</FormHelperText>
                   </Grid>
                 )}
-               
               </Grid>
             </form>
           )}

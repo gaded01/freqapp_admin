@@ -1,5 +1,5 @@
 import MainCard from 'components/MainCard';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,176 +8,177 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import { Stack, IconButton, InputAdornment, InputLabel, OutlinedInput, FormHelperText, Select, MenuItem } from '@mui/material';
+import { Stack, IconButton, InputAdornment, InputLabel, OutlinedInput, FormHelperText, Select, MenuItem, Button} from '@mui/material';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import { Modal, Spin } from 'antd';
 import Typography from '@mui/material/Typography';
-import { Button, Modal } from 'antd';
 import { Formik } from 'formik';
-import * as Yup from 'yup';
+import axios from 'axios';
 
+const initialValues = {
+  id: '',
+  name : '',
+  number: '',
+};
 function index() {
   const [open, setOpen] = React.useState(false);
   const [modalText, setModalText] = useState('Content of the modal');
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [values, setValues] = useState(initialValues);
+  const [info, setInfo] = useState({});
+  const [newData, setNewData] = useState(false);
 
   const showModal = () => {
     setOpen(true);
   };
 
-  const handleOk = () => {
-    setModalText('The modal will be closed after two seconds');
+  useEffect(() => {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .get(`${process.env.REACT_APP_BASE_API_URL}/get-information`, config)
+      .then((res) => {
+        if (res) {
+          console.log(res.data);
+          setInfo(res.data);
+        } else {
+          console.log(res.data.message);
+        }
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
+  },[newData])
+
+  const handleOk = async () => {
     setConfirmLoading(true);
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    await axios 
+      .post(`${process.env.REACT_APP_BASE_API_URL}/update-information`, values ,config)
+      .then((res) => {
+        console.log('erasd', res)
+       
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
     setTimeout(() => {
+      reloadData();
       setOpen(false);
       setConfirmLoading(false);
     }, 2000);
   };
 
+  const handleChange = (e) => {
+    const target = e.target;
+    setValues({ ...values, [target.name]: target.value });
+    
+  }
   const handleCancel = () => {
     console.log('Clicked cancel button');
     setOpen(false);
   };
 
+  const updateInfo = (values) => {
+    showModal();
+    setValues({
+      ...values,
+      id: values.id,
+      name: values.name,
+      number: values.number
+    });
 
-  function createBill(id, bank, number, name) {
-    return {id, bank, number ,name};
-  }
-  const billRows = [
-   createBill('1', 'GCash', '09569189201', 'Karl Requerta'),
-   createBill('2', 'Paymaya', '09569189123', 'Rose Marie Agaron'),
-  ];
+  };
 
+  const reloadData = () => {
+    if (!newData) {
+      setNewData(true);
+    } else {
+      setNewData(false);
+    }
+  };
   return (
     <MainCard>
       <Grid container alignItems="center" justifyContent="space-between" pb={2}>
         <Typography variant="h5">Payment Information</Typography>
-        <Button type="primary" onClick={showModal}>
-          Add Payment
-        </Button>
       </Grid>
-
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650, paddingTop: 0 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>No.</TableCell>
-              <TableCell>Bank/Wallet Name</TableCell>
-              <TableCell>Account Number</TableCell>
-              <TableCell>Name of the Owner</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {billRows.map((row) => (
-              <TableRow key={row.acc} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">
-                  {row.id}
-                </TableCell>
-                <TableCell>{row.bank}</TableCell>
-                <TableCell>{row.number}</TableCell>
-                <TableCell>{row.name}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* <Modal title="Add Plan" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
-        <Formik
-          initialValues={{
-            month: '',
-            year: '',
-            account_no: ''
-          }}
-          validationSchema={Yup.object().shape({
-            month: Yup.string().max(255).required('First name is required'),
-            year: Yup.string().max(255).required('Last name is required'),
-            account_no: Yup.string().max(255).required('Address is required')
-          })}
-          onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-            try {
-              submitLogin(values);
-              setStatus({ success: false });
-              setSubmitting(true);
-            } catch (err) {
-              setStatus({ success: false });
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
-          }}
-        >
-          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-            <form noValidate onSubmit={handleSubmit}>
+      <Card sx={{ maxWidth: 345 }}>
+      <CardMedia
+        component="img"
+        alt="gcash"
+        height="110"
+        src={require('../../assets/images/icons/glogo.png')}
+      />
+      {Object.keys(info).length?
+         <CardContent>
+         <Typography variant="h5" component="div">
+           {info.name}
+         </Typography>
+         <Typography gutterBottom variant="body1" component="div">
+          {info.number}
+         </Typography>
+         <Typography variant="body2" color="text.secondary">
+           GCash is a mobile wallet issued by Filipino telco Globe Telecom. 
+           Customers can use GCash to shop online and in-store, send money, 
+           top up mobile phone credits and pay bills.
+         </Typography>
+       </CardContent>
+       :
+       <CardContent sx={{display:'flex', justifyContent:'center', alignItems:'center', height: '100%'}}>
+          <Spin/>
+       </CardContent>
+      }
+     
+      <CardActions>
+        <Button size="small">Learn More</Button>
+        <Button size="small" onClick={()=> updateInfo(info)}>Update Information</Button>
+      </CardActions>
+    </Card>
+      <Modal title="Update Information" open={open} onOk={handleOk} confirmLoading={confirmLoading} onCancel={handleCancel}>
+        <Formik>
+          {({}) => (
+            <form noValidate>
               <Grid container spacing={1}>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <Stack spacing={1}>
-                    <InputLabel htmlFor="first_name">First Name</InputLabel>
+                    <InputLabel htmlFor="name">Gcash Name</InputLabel>
                     <OutlinedInput
-                      id="first_name"
-                      type="first_name"
-                      value={values.first_name}
-                      name="first_name"
-                      onBlur={handleBlur}
+                      id="name"
+                      type="name"
+                      value={values.name}
+                      name="name"
                       onChange={handleChange}
-                      placeholder="Enter first name"
+                      placeholder="Enter gcash name"
                       fullWidth
-                      error={Boolean(touched.first_name && errors.first_name)}
                     />
-                    {touched.first_name && errors.first_name && (
-                      <FormHelperText error id="standard-weight-helper-text-first_name">
-                        {errors.first_name}
-                      </FormHelperText>
-                    )}
-                  </Stack>
-                </Grid>
-                <Grid item xs={6}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="last_name">Last Name</InputLabel>
-                    <OutlinedInput
-                      id="last_name"
-                      type="last_name"
-                      value={values.last_name}
-                      name="last_name"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      placeholder="Enter last name"
-                      fullWidth
-                      error={Boolean(touched.last_name && errors.last_name)}
-                    />
-                    {touched.last_name && errors.last_name && (
-                      <FormHelperText error id="standard-weight-helper-text-name_name">
-                        {errors.last_name}
-                      </FormHelperText>
-                    )}
                   </Stack>
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={1}>
-                    <InputLabel htmlFor="address">Complete Address</InputLabel>
+                    <InputLabel htmlFor="number">Gcash Number</InputLabel>
                     <OutlinedInput
-                      fullWidth
-                      id="address"
-                      value={values.address}
-                      name="address"
-                      onBlur={handleBlur}
+                      id="number"
+                      type="name"
+                      value={values.number}
+                      name="number"
                       onChange={handleChange}
-                      placeholder="Enter complete address"
+                      placeholder="Enter gcash number"
+                      fullWidth
                     />
-                    {touched.address && errors.address && (
-                      <FormHelperText error id="standard-weight-helper-text-address">
-                        {errors.address}
-                      </FormHelperText>
-                    )}
                   </Stack>
                 </Grid>
-                {errors.submit && (
-                  <Grid item xs={12}>
-                    <FormHelperText error>{errors.submit}</FormHelperText>
-                  </Grid>
-                )}
                
               </Grid>
             </form>
           )}
         </Formik>
-      </Modal> */}
+      </Modal>
     </MainCard>
   );
 }
