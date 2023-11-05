@@ -18,7 +18,7 @@ const DrawerHeader = ({ open }) => {
     <DrawerHeaderStyled theme={theme} open={open}>
       <Stack direction="row" spacing={1} alignItems="center">
         {/* <Logo /> */}
-        <Typography sx={{fontSize: 20}} >FreqApp</Typography>
+        <Typography sx={{fontSize: 20}} >Freq IT Solutions</Typography>
         {/* <Chip
           label={process.env.REACT_APP_VERSION}
           size="small"
