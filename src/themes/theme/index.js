@@ -22,19 +22,19 @@ const Theme = (colors) => {
     A800: grey[16]
   };
   const contrastText = '#fff';
-
+  const orange = "#ff724c";
   return {
     primary: {
-      lighter: blue[0],
-      100: blue[1],
-      200: blue[2],
-      light: blue[3],
-      400: blue[4],
-      main: blue[5],
-      dark: blue[6],
-      700: blue[7],
-      darker: blue[8],
-      900: blue[9],
+      lighter: '#FFDAD2',
+      100: '#FFC2B5',
+      200: '#FBA997',
+      light: '#FB9C88',
+      400: '#F37E65',
+      main: '#F57458',
+      dark: '#F35735',
+      700: '#F64A26',
+      darker: '#F33E17',
+      900: '#E4300A',
       contrastText
     },
     secondary: {
@@ -70,11 +70,11 @@ const Theme = (colors) => {
       contrastText: greyColors[100]
     },
     info: {
-      lighter: cyan[0],
-      light: cyan[3],
-      main: cyan[5],
-      dark: cyan[7],
-      darker: cyan[9],
+      lighter: '#FFDAD2',
+      light: '#FB9C88',
+      main: '#F37E65',
+      dark: '#F35735',
+      darker: '#F35735',
       contrastText
     },
     success: {

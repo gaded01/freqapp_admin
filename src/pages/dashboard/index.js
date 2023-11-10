@@ -19,6 +19,11 @@ import {
   Typography
 } from '@mui/material';
 
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import {Icon} from 'leaflet';
+import "leaflet/dist/leaflet.css";
+import "./style.css";
+
 // project import
 import OrdersTable from './OrdersTable';
 import IncomeAreaChart from './IncomeAreaChart';
@@ -28,14 +33,17 @@ import SalesColumnChart from './SalesColumnChart';
 import MainCard from 'components/MainCard';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
 
+import {
+  GeoapifyGeocoderAutocomplete,
+  GeoapifyContext,
+} from "@geoapify/react-geocoder-autocomplete";
+
 //assets
 import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
 import avatar1 from 'assets/images/users/avatar-1.png';
 import avatar2 from 'assets/images/users/avatar-2.png';
 import avatar3 from 'assets/images/users/avatar-3.png';
 import avatar4 from 'assets/images/users/avatar-4.png';
-
-
 
 //avatar style
 const avatarSX = {
@@ -75,11 +83,12 @@ const status = [
 const DashboardDefault = () => {
   const [value, setValue] = useState('today');
   const [slot, setSlot] = useState('month');
-  const [data , setData ] = useState({});
+  const [data, setData] = useState({});
   const [consumption, setConsumption] = useState([]);
   const [income, setIncome] = useState([]);
+  const [location, setLocation] = useState([]);
 
-  useEffect(()=> {
+  useEffect(() => {
     const config = {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     };
@@ -90,13 +99,21 @@ const DashboardDefault = () => {
           console.log('data', res.data);
           setConsumption(res.data?.data_consumption);
           setIncome(res.data?.income);
-          setData(res.data)
+          setData(res.data);
+          setLocation(res.data.location);
         }
       })
       .catch((error) => {
         console.log('erri', error);
       });
-  },[])
+  }, []);
+
+  const customIcon = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-a.png'),
+    iconSize: [35,35]
+  })
+
+  const position = [11.158384, 124.991888];
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
@@ -105,16 +122,16 @@ const DashboardDefault = () => {
         <Typography variant="h5">Dashboard</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Annual Income" count={"₱ " + data?.annual_income?.amount}/>
+        <AnalyticEcommerce title="Annual Income" count={'₱ ' + data?.annual_income?.amount} />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Month Income" count={"₱ " +data?.month_income?.amount}/>
+        <AnalyticEcommerce title="Month Income" count={'₱ ' + data?.month_income?.amount} />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Pending Bill" count={data?.pending_income}/>
+        <AnalyticEcommerce title="Pending Bill" count={data?.pending_income} />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Subscriber" count={data?.subscriber}/>
+        <AnalyticEcommerce title="Subscriber" count={data?.subscriber} />
       </Grid>
       {/* <Grid item xs={12} sm={6} md={4} lg={3}>
         <AnalyticEcommerce title="Plan Available" count="0"/>
@@ -170,23 +187,42 @@ const DashboardDefault = () => {
               <Typography variant="h3">₱ {data?.month_income?.amount}</Typography>
             </Stack>
           </Box>
-          <MonthlyBarChart  incomes={income}/> 
+          <MonthlyBarChart incomes={income} />
         </MainCard>
       </Grid>
 
       {/* row 3 */}
-      {/* <Grid item xs={12} md={7} lg={8}>
+      <Grid item xs={12} md={7} lg={12}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Typography variant="h5">Recent Orders</Typography>
+            <Typography variant="h5">Subscriber location</Typography>
           </Grid>
           <Grid item />
         </Grid>
         <MainCard sx={{ mt: 2 }} content={false}>
-          <OrdersTable />
+          <MapContainer center={position} zoom={13} scrollWheelZoom={false}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {location.length? location.map((loc)=> {
+              return (
+                <Marker position={[loc.lat, loc.lon]} icon={customIcon}>
+                  <Popup>
+                    A pretty CSS3 popup. <br /> Easily customizable.
+                  </Popup>
+                </Marker>
+              )
+             
+            })
+            :
+            null  
+          }
+            
+          </MapContainer>
         </MainCard>
       </Grid>
-      <Grid item xs={12} md={5} lg={4}>
+      {/* <Grid item xs={12} md={5} lg={4}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Typography variant="h5">Analytics Report</Typography>

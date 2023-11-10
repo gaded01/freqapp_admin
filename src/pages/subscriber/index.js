@@ -20,8 +20,12 @@ import {
   Pagination,
   FormControl,
   Switch,
+  List,
   ListItem,
   ListItemText,
+  ListItemButton,
+  ListSubheader,
+  ListItemIcon,
   Alert,
   Snackbar
 } from '@mui/material';
@@ -30,6 +34,7 @@ import { Button, Modal, Tag, Spin } from 'antd';
 import { Formik } from 'formik';
 import axios from 'axios';
 import { EditOutlined } from '@ant-design/icons';
+import PlaceIcon from '@mui/icons-material/Place';
 
 const initialState = {
   id: '',
@@ -37,6 +42,8 @@ const initialState = {
   middle_name: '',
   last_name: '',
   address: '',
+  lat: '',
+  lon: '',
   contact_number: '',
   plan_type_id: ''
 };
@@ -54,12 +61,34 @@ function index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [validate, setValidate] = useState({});
   const [alertOpen, setAlertOpen] = useState(false);
+  const [autocompelete, setAutoComplete] = useState([]);
 
   const showModal = () => {
     setValidate({});
     setOpen(true);
     populatePlanTypes();
   };
+
+  const searchAddress = () => {
+    console.log(values.address);
+    setAutoComplete([])
+    axios
+      .get('https://api.geoapify.com/v1/geocode/autocomplete', {
+        params: {
+          text: values.address,
+          apiKey: '124a6fb19cab481cabeb3eb096fa944c'
+        }
+      })
+      .then(function (response) {
+        response.data.features.map((feature) => {
+          setAutoComplete((autocomplete) => [...autocomplete, feature]);
+        });
+      })
+      .catch(function (error) {
+        console.log('error', error);
+      });
+  };
+
 
   const handleOk = () => {
     let route = 'subs-registration';
@@ -214,8 +243,10 @@ function index() {
     }
     setLoading(false);
   };
-
-  
+  const selectPlace = (place) => {
+    setValues({ ...values, address: place.properties.formatted, lon: place.properties.lon, lat: place.properties.lat });
+    setAutoComplete([]);
+  }
   return (
     <MainCard>
       <Grid container alignItems="center" justifyContent="space-between" pb={2}>
@@ -274,7 +305,6 @@ function index() {
             )}
           </TableBody>
         </Table>
-      
       </TableContainer>
 
       {/* <Pagination sx={{paddingTop: "1rem"}} count={10} variant="outlined" shape="rounded" /> */}
@@ -346,8 +376,8 @@ function index() {
                     />
                   </Stack>
                 </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
+                <Grid item xs={12} style={{position: 'relative'}}>
+                  <Stack spacing={1} >
                     <InputLabel htmlFor="address">Complete Address</InputLabel>
                     <OutlinedInput
                       fullWidth
@@ -358,6 +388,38 @@ function index() {
                       placeholder="Enter complete address"
                     />
                   </Stack>
+                  <Button
+                    style={{position: 'absolute', zIndex: '2', right: '.5rem', top: '3.55rem'}}
+                    onClick={() => searchAddress()}
+                    type="primary"
+                  >
+                      Search
+                  </Button>
+                  {autocompelete.length? 
+                     <List
+                     sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+                     component="nav"
+                     aria-labelledby="nested-list-subheader"
+                     subheader={
+                       <ListSubheader component="div" id="nested-list-subheader">
+                        Search List
+                       </ListSubheader>
+                     }
+                   >
+                  {autocompelete.map((search) => {
+                   return (
+                     <ListItemButton onClick={()=> selectPlace(search)}>
+                       <ListItemIcon style={{marginRight:".5rem"}}><PlaceIcon/></ListItemIcon>
+                       <ListItemText primary={search.properties.formatted} > </ListItemText>
+                     </ListItemButton>
+                
+                   );
+                 })}
+                    </List>
+                    :
+                    <Typography style={{color:"gray", textAlign: 'center', paddingTop: '2rem'}}>No place found. Try searching places to find your address.</Typography>
+                  }
+                 
                 </Grid>
                 <Grid item xs={6}>
                   <Stack spacing={1}>
@@ -388,11 +450,12 @@ function index() {
                         {/* <MenuItem hidden>Select Gender</MenuItem>  */}
                         {planTypes
                           ? planTypes.map((planType) => (
-                              <MenuItem disabled={planType.status == 1? false : true} key={planType.id} value={planType.id}>
+                              <MenuItem disabled={planType.status == 1 ? false : true} key={planType.id} value={planType.id}>
                                 {planType.mbps} mbps plan
                               </MenuItem>
                             ))
-                          : null}
+                          : null
+                        }
                       </Select>
                     </FormControl>
                   </Stack>
@@ -407,8 +470,8 @@ function index() {
         <Pagination sx={{ paddingTop: '1rem' }} count={page} variant="outlined" shape="rounded" onChange={getCurrentPage} />
       </Grid>
 
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right'  }} open={alertOpen} autoHideDuration={3000} onClose={handleClose}>
-        <Alert severity="success" sx={{ width: '100%', backgroundColor:"#008000", color: "#ffffff" }}>
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={alertOpen} autoHideDuration={3000} onClose={handleClose}>
+        <Alert severity="success" sx={{ width: '100%', backgroundColor: '#008000', color: '#ffffff' }}>
           New subscriber added successfully!
         </Alert>
       </Snackbar>
