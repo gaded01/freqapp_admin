@@ -275,7 +275,7 @@ function index() {
                   <TableCell component="th" scope="row">
                     {row.account_no}
                   </TableCell>
-                  <TableCell>{`${row.user_subscriber.first_name} ${row.user_subscriber.middle_name} ${row.user_subscriber.last_name}`}</TableCell>
+                  <TableCell style={{textTransform: 'capitalize'}}>{`${row.user_subscriber.first_name} ${row.user_subscriber.middle_name} ${row.user_subscriber.last_name}`}</TableCell>
                   <TableCell>{row.user_subscriber.contact_number}</TableCell>
                   <TableCell>{row.plan_type.mbps} Mbps Plan</TableCell>
                   <TableCell>{row.status == 1 ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}</TableCell>
