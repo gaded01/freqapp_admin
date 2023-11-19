@@ -58,6 +58,9 @@ const IncomeAreaChart = ({ slot, consumptions }) => {
       },
       yaxis: {
         labels: {
+          formatter: (value) => {
+            return value.toFixed(1)
+          },
           style: {
             colors: [secondary]
           }

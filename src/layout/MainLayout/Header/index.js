@@ -29,7 +29,8 @@ const Header = ({ open, handleDrawerToggle }) => {
         onClick={handleDrawerToggle}
         edge="start"
         color="secondary"
-        sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
+        // sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
+        sx={{ color: 'text.primary', bgcolor: open ? '#FFDAD2' : iconBackColor, ml: { xs: 0, lg: -2 } }}
       >
         {!open ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       </IconButton>
@@ -43,6 +44,7 @@ const Header = ({ open, handleDrawerToggle }) => {
     color: 'inherit',
     elevation: 0,
     sx: {
+      backgroundColor: '#F57458',
       borderBottom: `1px solid ${theme.palette.divider}`
       // boxShadow: theme.customShadows.z1
     }

@@ -96,7 +96,7 @@ const DashboardDefault = () => {
       .get(`${process.env.REACT_APP_BASE_API_URL}/data-consumption`, config)
       .then((res) => {
         if (res) {
-          console.log('data', res.data);
+          console.log('map', res.data);
           setConsumption(res.data?.data_consumption);
           setIncome(res.data?.income);
           setData(res.data);
@@ -195,7 +195,7 @@ const DashboardDefault = () => {
       <Grid item xs={12} md={7} lg={12}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Typography variant="h5">Subscriber location</Typography>
+            <Typography variant="h5">Subscriber Location</Typography>
           </Grid>
           <Grid item />
         </Grid>
@@ -209,7 +209,7 @@ const DashboardDefault = () => {
               return (
                 <Marker position={[loc.lat, loc.lon]} icon={customIcon}>
                   <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
+                    <Typography style={{textTransform: 'capitalize'}}>{loc.user?.first_name} {loc.user?.last_name}</Typography>  {loc.user?.data_consumption[3].consumption} mbps
                   </Popup>
                 </Marker>
               )

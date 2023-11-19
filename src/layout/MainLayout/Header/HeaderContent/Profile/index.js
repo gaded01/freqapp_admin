@@ -99,14 +99,14 @@ const Profile = ({ user }) => {
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar
             alt={`${user.first_name}`}
-            sx={{ width: 34, height: 34 }}
+            sx={{ width: 34, height: 34, bgcolor: '#FFDAD2', color: '#000' }}
             src="https://www.flaticon.com/free-icon/user_149071?term=user+avatar&page=1&position=2&origin=tag&related_id=149071"
           />
           <Stack alignItems="baseline">
-            <Typography variant="subtitle1">
+            <Typography variant="subtitle1" sx={{color: '#fff'}}>
               {user.first_name} {user.middle_name} {user.last_name}
             </Typography>
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="body2" color="textSecondary" sx={{color: '#fff'}}>
               {user? 'Admin': null}
             </Typography>
           </Stack>
