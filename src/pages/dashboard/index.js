@@ -108,8 +108,24 @@ const DashboardDefault = () => {
       });
   }, []);
 
-  const customIcon = new Icon({
-    iconUrl : require('../../assets/images/icons/location-pin-a.png'),
+  const customIcon1 = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-orange.png'),
+    iconSize: [35,35]
+  })
+  const customIcon2 = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-blue.png'),
+    iconSize: [35,35]
+  })
+  const customIcon3 = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-red.png'),
+    iconSize: [35,35]
+  })
+  const customIcon4 = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-purple.png'),
+    iconSize: [35,35]
+  })
+  const customIcon5 = new Icon({
+    iconUrl : require('../../assets/images/icons/location-pin-lightblue.png'),
     iconSize: [35,35]
   })
 
@@ -206,13 +222,16 @@ const DashboardDefault = () => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {location.length? location.map((loc)=> {
-              return (
-                <Marker position={[loc.lat, loc.lon]} icon={customIcon}>
-                  <Popup>
-                    <Typography style={{textTransform: 'capitalize'}}>{loc.user?.first_name} {loc.user?.last_name}</Typography>  {loc.user?.data_consumption[3].consumption} mbps
-                  </Popup>
-                </Marker>
-              )
+                return (
+               
+                  <Marker position={[loc.lat, loc.lon]} icon={loc.user.subscriber.plan_type.id == 15 ? customIcon1 : loc.user.subscriber.plan_type.id == 16 ? customIcon2 : loc.user.subscriber.plan_type.id == 17 ? customIcon3 : loc.user.subscriber.plan_type.id == 18 ? customIcon4 : customIcon5 }>
+                    <Popup>
+                      <Typography style={{textTransform: 'capitalize'}}>{loc.user?.first_name} {loc.user?.last_name}</Typography>  {loc.user?.subscriber.plan_type.mbps} mbps
+                    </Popup>
+                  </Marker>
+                )
+           
+             
              
             })
             :
