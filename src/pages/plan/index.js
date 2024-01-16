@@ -177,7 +177,7 @@ function index() {
             {planType.map((row) => (
               <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                 <TableCell>{row.mbps} mbps plan</TableCell>
-                <TableCell>{row.price}</TableCell>
+                <TableCell>{'₱'+row.price + '.00'}</TableCell>
                 <TableCell>{row.status == 1 ? <Tag color="green">Available</Tag> : <Tag color="red">Unavailable</Tag>}</TableCell>
                 <TableCell align="center">
                   {' '}

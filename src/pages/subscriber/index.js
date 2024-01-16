@@ -148,6 +148,13 @@ function index() {
     setValues({ ...values, [target.name]: target.value });
   };
 
+  const handleNameChanges = (e) => {
+    const target = e.target;
+    if(isNaN(+target.value)){
+      setValues({ ...values, [target.name]: target.value });
+    }
+  }
+
   const handleCancel = () => {
     console.log('Clicked cancel button');
     setAction('Add');
@@ -338,10 +345,10 @@ function index() {
                     <InputLabel htmlFor="first_name">First Name</InputLabel>
                     <OutlinedInput
                       id="first_name"
-                      type="first_name"
+                      type="text"
                       value={values.first_name}
                       name="first_name"
-                      onChange={handleChanges}
+                      onChange={handleNameChanges}
                       placeholder="Enter first name"
                       required
                       fullWidth
@@ -353,10 +360,10 @@ function index() {
                     <InputLabel htmlFor="middle_name">Middle Name</InputLabel>
                     <OutlinedInput
                       id="middle_name"
-                      type="middle_name"
+                      type="text"
                       value={values.middle_name}
                       name="middle_name"
-                      onChange={handleChanges}
+                      onChange={handleNameChanges}
                       placeholder="Enter middle name"
                       fullWidth
                     />
@@ -367,10 +374,10 @@ function index() {
                     <InputLabel htmlFor="last_name">Last Name</InputLabel>
                     <OutlinedInput
                       id="last_name"
-                      type="last_name"
+                      type="text"
                       value={values.last_name}
                       name="last_name"
-                      onChange={handleChanges}
+                      onChange={handleNameChanges}
                       placeholder="Enter last name"
                       fullWidth
                     />

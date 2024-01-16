@@ -287,7 +287,7 @@ function index() {
                     )}{' '}
                   </TableCell>
                   <TableCell align="left">{list.month} 30</TableCell>
-                  <TableCell align="left">₱ {list.amount}</TableCell>
+                  <TableCell align="left">₱ {list.amount + '.00'}</TableCell>
                   {/* <TableCell align="center"><Button type="text"><EyeTwoTone style={{fontSize: 16}}/></Button></TableCell> */}
                   <TableCell align="center">
                     {list.formatted_image_url != null ?

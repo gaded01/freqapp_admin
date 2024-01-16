@@ -120,10 +120,10 @@ const DashboardDefault = () => {
         <Typography variant="h5">Dashboard</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Annual Income" count={'₱ ' + data?.annual_income?.amount} />
+        <AnalyticEcommerce title="Annual Income" count={'₱ ' + data?.annual_income?.amount + '.00'} />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Month Income" count={'₱ ' + data?.month_income?.amount} />
+        <AnalyticEcommerce title="Month Income" count={'₱ ' + data?.month_income?.amount + '.00'} />
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
         <AnalyticEcommerce title="Pending Bill" count={data?.pending_income} />
@@ -171,7 +171,7 @@ const DashboardDefault = () => {
               <Typography variant="h6" color="textSecondary">
                 This Month Income
               </Typography>
-              <Typography variant="h3">₱ {data?.month_income?.amount}</Typography>
+              <Typography variant="h3">₱ {data?.month_income?.amount + '.00'}</Typography>
             </Stack>
           </Box>
           <MonthlyBarChart incomes={income} />
