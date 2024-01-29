@@ -34,17 +34,21 @@ const areaChartOptions = {
 const IncomeAreaChart = ({ slot, consumptions }) => {
   const theme = useTheme();
 
+  
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
   const [options, setOptions] = useState(areaChartOptions);
 
-
+  let months = ["Jan 2023", "Feb 2023", "Mar 2023", "Apr 2023", "May 2023", "Jun 2023", "Jul 2023", "Aug 2023", "Sep 2023", "Oct2023", "Nov 2023", "Dec 2023" , "Jan 2024"];
+  
+  const staticRandomNumbers = [254, 387, 472, 192, 359, 215, 418, 176, 491, 293, 167, 420, 278];
+  
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
       colors: [theme.palette.primary.main, theme.palette.primary[700]],
       xaxis: {
-        categories: consumptions?.map((data) => data.month),
+        categories: months,
         labels: {
           style: {
             colors: secondary,
@@ -86,7 +90,7 @@ const IncomeAreaChart = ({ slot, consumptions }) => {
     setSeries([
       {
         name: 'Data Consumption (Gigabyte)',
-        data: consumptions?.map((data) => data.consumption),
+        data: staticRandomNumbers,
       }
     ]); 
   }, [slot, consumptions]);

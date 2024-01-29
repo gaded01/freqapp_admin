@@ -56,6 +56,7 @@ const MonthlyBarChart = ({incomes}) => {
 
   const [options, setOptions] = useState(barChartOptions);
 
+  
   useEffect(() => {
     setSeries([
       {

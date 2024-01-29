@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 //material-ui
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Grid, Stack, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
@@ -12,6 +12,7 @@ import './style.css';
 import IncomeAreaChart from './IncomeAreaChart';
 import MonthlyBarChart from './MonthlyBarChart';
 import MainCard from 'components/MainCard';
+import {Tag, Image, Spin } from 'antd';
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
 import { FormControl, InputLabel, MenuItem, Select } from '../../../node_modules/@mui/material/index';
 
@@ -22,6 +23,8 @@ const DashboardDefault = () => {
   const [filterLoc, setFilterLoc] = useState(null);
   const [slot, setSlot] = useState('month');
   const [data, setData] = useState({});
+  const [dueDateBill, setDueDateBill] = useState([]);
+  const [paidBill, setPaidBill] = useState([]);
   const [planTypes, setPlanTypes] = useState([]);
   const [consumption, setConsumption] = useState([]);
   const [income, setIncome] = useState([]);
@@ -47,6 +50,42 @@ const DashboardDefault = () => {
         console.log('erri', error);
       });
   }, []);
+
+  
+  useEffect(() => {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .get(`${process.env.REACT_APP_BASE_API_URL}/due-date-bill`, config)
+      .then((res) => {
+        if (res) {
+          console.log('map222', res.data);
+          setDueDateBill(res.data.bills);
+        }
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    };
+    axios
+      .get(`${process.env.REACT_APP_BASE_API_URL}/paid-bill`, config)
+      .then((res) => {
+        if (res) {
+          setPaidBill(res.data.paid_bills);
+        }
+      })
+      .catch((error) => {
+        console.log('erri', error);
+      });
+  }, []);
+
+
 
   const populatePlanTypes = async () => {
     const config = {
@@ -238,7 +277,135 @@ const DashboardDefault = () => {
           </MapContainer>
         </MainCard>
       </Grid>
+      <Grid item xs={12} md={6} lg={6}>
+        <Grid container alignItems="center" justifyContent="space-between">
+          <Grid item>
+            <Typography variant="h5">Outstanding Bills</Typography>
+          </Grid>
+        </Grid>
+        <MainCard content={false} sx={{ mt: 1.5 }}>
+          <Box sx={{ pt: 1, pr: 2 }}>
+          <TableContainer>
+            <Table sx={{ minHeight: 450 ,minWidth: 650, paddingTop: 0 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">Subscriber</TableCell>
+                  <TableCell align="left">Month/Year</TableCell>
+                  <TableCell align="left">Status</TableCell>
+                  <TableCell align="left">Due Date</TableCell>
+                  <TableCell align="left">Amount</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {dueDateBill.length ? (
+                  dueDateBill.map((list) => (
+                    <TableRow key={list.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell align="left">
+                        {`${list.subscriber.user_subscriber.first_name} ${list.subscriber.user_subscriber.last_name}`}
+                        <Typography variant="body2" sx={{color: 'gray'}}>{list.subscriber.account_no}</Typography>
+                      </TableCell>
+                      <TableCell align="left">{`${list.month} ${list.year}`}</TableCell>
+                      <TableCell align="left">
+                        {list.status == 2 ? (
+                          <Tag color="green">Paid</Tag>
+                        ) : list.status == 1 ? (
+                          <Tag color="orange">Verying</Tag>
+                        ) : list.status == 0 ? (
+                          <Tag color="red">Pending</Tag>
+                        ) : (
+                          <Tag color="red">Rejected</Tag>
+                        )}{' '}
+                      </TableCell>
+                      <TableCell align="left">{list.month} 30</TableCell>
+                      <TableCell align="left">₱ {list.amount + '.00'}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                
+                  <Grid container sx={{position: 'absolute', top: '50%', left: '55%'}}>
+                    <Grid item sx={{ textAlign: 'center' }}>
+                      <Spin />
+                    </Grid>
+                  </Grid>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          </Box>
+        </MainCard>
+      </Grid>
+      <Grid item xs={12} md={6} lg={6}>
+        <Grid container alignItems="center" justifyContent="space-between">
+          <Grid item>
+            <Typography variant="h5">Paid Month Bills</Typography>
+          </Grid>
+        </Grid>
+        <MainCard content={false} sx={{ mt: 1.5 }}>
+          <Box sx={{ pt: 1, pr: 2 }}>
+          <TableContainer>
+            <Table sx={{ minHeight: 450 ,minWidth: 650, paddingTop: 0 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">Subscriber</TableCell>
+                  <TableCell align="left">Month/Year</TableCell>
+                  <TableCell align="left">Status</TableCell>
+                  <TableCell align="left">Bill</TableCell>
+                  <TableCell align="center">Proof</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paidBill.length ? (
+                  paidBill.map((list) => (
+                    <TableRow key={list.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell align="left">
+                        {`${list.subscriber.user_subscriber.first_name} ${list.subscriber.user_subscriber.last_name}`}
+                        <Typography variant="body2" sx={{color: 'gray'}}>{list.subscriber.account_no}</Typography>
+                      </TableCell>
+                      <TableCell align="left">{`${list.month} ${list.year}`}</TableCell>
+                      <TableCell align="left">
+                        {list.status == 2 ? (
+                          <Tag color="green">Paid</Tag>
+                        ) : list.status == 1 ? (
+                          <Tag color="orange">Verying</Tag>
+                        ) : list.status == 0 ? (
+                          <Tag color="red">Pending</Tag>
+                        ) : (
+                          <Tag color="red">Rejected</Tag>
+                        )}{' '}
+                      </TableCell>
+                      <TableCell align="left">₱ {list.amount + '.00'}</TableCell>
+                      {/* <TableCell align="center"><Button type="text"><EyeTwoTone style={{fontSize: 16}}/></Button></TableCell> */}
+                      <TableCell align="center">
+                        {list.formatted_image_url != null ?
+                            <Image width={30} src={list.formatted_image_url} />  
+                          :
+                        <Typography variant="body2" sx={{color: '#c9c9c9'}}>No Image</Typography>
+                        }
+                    
+                      </TableCell>
+                      {/* <TableCell align="center"><CheckOutlined style={{color: '#1677ff', fontSize: 18}}/>&nbsp;&nbsp;&nbsp;&nbsp;<CloseOutlined  style={{color: '#1677ff',  fontSize: 18}}/> </TableCell> */}
+                    </TableRow>
+                  ))
+                ) : (
+                
+                  <Grid container sx={{position: 'absolute', top: '50%', left: '55%'}}>
+                    <Grid item sx={{ textAlign: 'center' }}>
+                      <Spin />
+                    </Grid>
+                  </Grid>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          </Box>
+        </MainCard>
+      </Grid>
     </Grid>
+
+
+
+
+
   );
 };
 export default DashboardDefault;
