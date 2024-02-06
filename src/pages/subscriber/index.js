@@ -92,6 +92,7 @@ function index() {
 
   const handleOk = () => {
     let route = 'subs-registration';
+    console.log('valueasdasdasdasdasdasdasdasds', values);
     setConfirmLoading(true);
     const config = {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -284,7 +285,7 @@ function index() {
                   </TableCell>
                   <TableCell style={{textTransform: 'capitalize'}}>{`${row.user_subscriber.first_name} ${row.user_subscriber.middle_name} ${row.user_subscriber.last_name}`}</TableCell>
                   <TableCell>{row.user_subscriber.contact_number}</TableCell>
-                  <TableCell>{row.plan_type.mbps} Mbps Plan</TableCell>
+                  <TableCell>{row.plan_type ? row.plan_type.mbps + ' Mbps Plan' : 'No Plan' }</TableCell>
                   <TableCell>{row.status == 1 ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}</TableCell>
                   <TableCell align="center">
                     <Switch
@@ -458,7 +459,7 @@ function index() {
                         {planTypes
                           ? planTypes.map((planType) => (
                               <MenuItem disabled={planType.status == 1 ? false : true} key={planType.id} value={planType.id}>
-                                {planType.mbps} mbps plan
+                                {planType?.mbps} mbps plan
                               </MenuItem>
                             ))
                           : null

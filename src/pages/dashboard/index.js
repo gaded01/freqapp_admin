@@ -253,14 +253,16 @@ const DashboardDefault = () => {
                     <Marker
                       position={[loc.lat, loc.lon]}
                       icon={
-                        loc.user.subscriber.plan_type.id == 15
+                        loc.user.subscriber.plan_type?.id == 15
                           ? customIcon1
-                          : loc.user.subscriber.plan_type.id == 16
+                          : loc.user.subscriber.plan_type?.id == 16
                           ? customIcon2
-                          : loc.user.subscriber.plan_type.id == 17
+                          : loc.user.subscriber.plan_type?.id == 17
                           ? customIcon3
-                          : loc.user.subscriber.plan_type.id == 18
+                          : loc.user.subscriber.plan_type?.id == 18
                           ? customIcon4
+                          : loc.user.subscriber.plan_type?.id == null
+                          ? customIcon5
                           : customIcon5
                       }
                     >
@@ -268,7 +270,7 @@ const DashboardDefault = () => {
                         <Typography style={{ textTransform: 'capitalize' }}>
                           {loc.user?.first_name} {loc.user?.last_name}
                         </Typography>{' '}
-                        {loc.user?.subscriber.plan_type.mbps} mbps
+                        {loc.user?.subscriber.plan_type?.mbps} mbps
                       </Popup>
                     </Marker>
                   );
