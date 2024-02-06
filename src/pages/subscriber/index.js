@@ -92,7 +92,7 @@ function index() {
 
   const handleOk = () => {
     let route = 'subs-registration';
-    console.log('valueasdasdasdasdasdasdasdasds', values);
+
     setConfirmLoading(true);
     const config = {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -105,6 +105,7 @@ function index() {
         if (res) {
           if (res.data.status == 'failed') {
             setValidate(res.data.messages);
+            console.log('valueasdasdasdasdasdasdasdasds', values);
             setOpen(true);
           } else {
             setNewData(true);
