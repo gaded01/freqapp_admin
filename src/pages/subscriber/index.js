@@ -35,6 +35,7 @@ import { Formik } from 'formik';
 import axios from 'axios';
 import { EditOutlined } from '@ant-design/icons';
 import PlaceIcon from '@mui/icons-material/Place';
+import { TextField } from '../../../node_modules/@mui/material/index';
 
 const initialState = {
   id: '',
@@ -62,6 +63,9 @@ function index() {
   const [validate, setValidate] = useState({});
   const [alertOpen, setAlertOpen] = useState(false);
   const [autocompelete, setAutoComplete] = useState([]);
+  const [searchInput, setSearchInput] = useState();
+  const [loading, setLoading] = useState(false);
+
 
   const showModal = () => {
     setValidate({});
@@ -152,7 +156,7 @@ function index() {
 
   const handleNameChanges = (e) => {
     const target = e.target;
-    if(isNaN(+target.value)){
+    if (isNaN(+target.value)) {
       setValues({ ...values, [target.name]: target.value });
     }
   }
@@ -256,13 +260,57 @@ function index() {
     setValues({ ...values, address: place.properties.formatted, lon: place.properties.lon, lat: place.properties.lat });
     setAutoComplete([]);
   }
+
+  const handleSearchInput = (event) => {
+    const value = event.target.value;
+    setSearchInput(value);
+  };
+
+
+  const searchSubs = async (e) => {
+  
+    if (e.keyCode == 13) {
+      console.log('working');
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      };
+      setLoading(true);
+      await axios
+        .post(`${process.env.REACT_APP_BASE_API_URL}/search-subscriber`, { search: searchInput }, config)
+        .then((res) => {
+          console.log('res', res.data);
+          setSubscriber(() => res.data.data);
+          setPage(res.data.last_page);
+        })
+        .catch((err) => {
+          console.log('err', err);
+        });
+      setLoading(false);
+    }
+  };
+
+
+
   return (
     <MainCard>
       <Grid container alignItems="center" justifyContent="space-between" pb={2}>
-        <Typography variant="h5">Subscriber</Typography>
-        <Button type="primary" onClick={showModal}>
-          Add Subscriber
-        </Button>
+        <Grid item> 
+          <Typography variant="h5">Subscriber</Typography>
+        </Grid>
+        <Grid item>
+          <Button type="primary" onClick={showModal}>
+            Add Subscriber
+          </Button>
+          <TextField
+            sx={{marginLeft: 2}}
+            id="outlined-basic-email"
+            label="Search"
+            onKeyDown={searchSubs}
+            onChange={handleSearchInput}
+            variant="outlined"
+          />
+        </Grid>
+
       </Grid>
 
       <TableContainer component={Paper}>
@@ -284,9 +332,9 @@ function index() {
                   <TableCell component="th" scope="row">
                     {row.account_no}
                   </TableCell>
-                  <TableCell style={{textTransform: 'capitalize'}}>{`${row.user_subscriber.first_name} ${row.user_subscriber.middle_name} ${row.user_subscriber.last_name}`}</TableCell>
+                  <TableCell style={{ textTransform: 'capitalize' }}>{`${row.user_subscriber.first_name} ${row.user_subscriber.middle_name} ${row.user_subscriber.last_name}`}</TableCell>
                   <TableCell>{row.user_subscriber.contact_number}</TableCell>
-                  <TableCell>{row.plan_type ? row.plan_type.mbps + ' Mbps Plan' : 'No Plan' }</TableCell>
+                  <TableCell>{row.plan_type ? row.plan_type.mbps + ' Mbps Plan' : 'No Plan'}</TableCell>
                   <TableCell>{row.status == 1 ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}</TableCell>
                   <TableCell align="center">
                     <Switch
@@ -339,7 +387,7 @@ function index() {
         ) : null}
 
         <Formik>
-          {({}) => (
+          {({ }) => (
             <form noValidate>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -385,7 +433,7 @@ function index() {
                     />
                   </Stack>
                 </Grid>
-                <Grid item xs={12} style={{position: 'relative'}}>
+                <Grid item xs={12} style={{ position: 'relative' }}>
                   <Stack spacing={1} >
                     <InputLabel htmlFor="address">Complete Address</InputLabel>
                     <OutlinedInput
@@ -398,37 +446,37 @@ function index() {
                     />
                   </Stack>
                   <Button
-                    style={{position: 'absolute', zIndex: '2', right: '.5rem', top: '3.55rem'}}
+                    style={{ position: 'absolute', zIndex: '2', right: '.5rem', top: '3.55rem' }}
                     onClick={() => searchAddress()}
                     type="primary"
                   >
-                      Search
+                    Search
                   </Button>
-                  {autocompelete.length? 
-                     <List
-                     sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-                     component="nav"
-                     aria-labelledby="nested-list-subheader"
-                     subheader={
-                       <ListSubheader component="div" id="nested-list-subheader">
-                        Search List
-                       </ListSubheader>
-                     }
-                   >
-                  {autocompelete.map((search) => {
-                   return (
-                     <ListItemButton onClick={()=> selectPlace(search)}>
-                       <ListItemIcon style={{marginRight:".5rem"}}><PlaceIcon/></ListItemIcon>
-                       <ListItemText primary={search.properties.formatted} > </ListItemText>
-                     </ListItemButton>
-                
-                   );
-                 })}
+                  {autocompelete.length ?
+                    <List
+                      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+                      component="nav"
+                      aria-labelledby="nested-list-subheader"
+                      subheader={
+                        <ListSubheader component="div" id="nested-list-subheader">
+                          Search List
+                        </ListSubheader>
+                      }
+                    >
+                      {autocompelete.map((search) => {
+                        return (
+                          <ListItemButton onClick={() => selectPlace(search)}>
+                            <ListItemIcon style={{ marginRight: ".5rem" }}><PlaceIcon /></ListItemIcon>
+                            <ListItemText primary={search.properties.formatted} > </ListItemText>
+                          </ListItemButton>
+
+                        );
+                      })}
                     </List>
                     :
-                    <Typography style={{color:"gray", textAlign: 'center', paddingTop: '2rem'}}>No place found. Try searching places to find your address.</Typography>
+                    <Typography style={{ color: "gray", textAlign: 'center', paddingTop: '2rem' }}>No place found. Try searching places to find your address.</Typography>
                   }
-                 
+
                 </Grid>
                 <Grid item xs={6}>
                   <Stack spacing={1}>
@@ -459,10 +507,10 @@ function index() {
                         {/* <MenuItem hidden>Select Gender</MenuItem>  */}
                         {planTypes
                           ? planTypes.map((planType) => (
-                              <MenuItem disabled={planType.status == 1 ? false : true} key={planType.id} value={planType.id}>
-                                {planType?.mbps} mbps plan
-                              </MenuItem>
-                            ))
+                            <MenuItem disabled={planType.status == 1 ? false : true} key={planType.id} value={planType.id}>
+                              {planType?.mbps} mbps plan
+                            </MenuItem>
+                          ))
                           : null
                         }
                       </Select>

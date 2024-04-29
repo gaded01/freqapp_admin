@@ -262,6 +262,7 @@ function index() {
               <TableCell align="left">Status</TableCell>
               <TableCell align="left">Due Date</TableCell>
               <TableCell align="left">Bill</TableCell>
+              <TableCell align="left">Payment</TableCell>
               <TableCell align="center">Proof</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
@@ -288,6 +289,11 @@ function index() {
                   </TableCell>
                   <TableCell align="left">{list.month} 30</TableCell>
                   <TableCell align="left">₱ {list.amount + '.00'}</TableCell>
+                  <TableCell align="left">{list.payment == 1 ? (
+                      <Tag color="green">Onsit Payment</Tag>
+                    ) : list.payment == 0 ? (
+                      <Tag color="orange">Offsite Payment</Tag>
+                    ): null}</TableCell>
                   {/* <TableCell align="center"><Button type="text"><EyeTwoTone style={{fontSize: 16}}/></Button></TableCell> */}
                   <TableCell align="center">
                     {list.formatted_image_url != null ?
