@@ -171,13 +171,13 @@ function index() {
             />
             <CardContent>
               <Typography variant="h5" component="div">
-                Kenneth Lopez
+               Bank Account
               </Typography>
               <Typography gutterBottom variant="body1" component="div">
-                09596818283
+                9485-293-321
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Maya Wallet, powered by Maya Philippines, Inc. and commonly still referred to as PayMaya, allows money transfers between Maya users; send money to other local banks; pay recurring bills.
+              Mastercard Inc. is an American multinational payment card services corporation headquartered in Purchase, New York. It offers a range of payment transaction processing and other related-payment services.
               </Typography>
             </CardContent>
             <CardActions>

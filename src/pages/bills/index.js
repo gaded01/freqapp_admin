@@ -22,6 +22,7 @@ import {
   ListItem,
   Alert,
   Snackbar,
+  Link
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { Button, Modal, Tag, Image, Spin } from 'antd';
@@ -57,6 +58,7 @@ function index() {
   const [exist, setExist ] = useState(null);
   const [alertOpen, setAlertOpen] = useState(false);
   const [confirmation ,setConfirmation] = useState();
+  const [subId, setSubId]  = useState();
 
   const handleChanges = (e) => {
     const target = e.target;
@@ -120,7 +122,7 @@ function index() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_API_URL}/sub-bill?page=${currentPage}`, config)
+      .post(`${process.env.REACT_APP_BASE_API_URL}/sub-bill?page=${currentPage}`,{id : subId}, config)
       .then((res) => {
         if (res) {
           console.log('radasdsad', res.data);
@@ -133,7 +135,7 @@ function index() {
       .catch((error) => {
         console.log('erri', error);
       });
-  }, [newData]);
+  }, [newData, subId]);
 
   useEffect(() => {
     (async () => {
@@ -188,7 +190,7 @@ function index() {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     };
     axios
-      .get(`${process.env.REACT_APP_BASE_API_URL}/sub-bill?page=${value}`, config)
+      .post(`${process.env.REACT_APP_BASE_API_URL}/sub-bill?page=${value}`,{id : subId}, config)
       .then((res) => {
         if (res) {
           console.log(res.data);
@@ -243,6 +245,11 @@ function index() {
         ),
     })
   }
+
+  const selectSub = (id) => {
+    setSubId(id);
+    console.log('id',id)
+  }
   
   return (
     <MainCard>
@@ -272,7 +279,7 @@ function index() {
               billList.map((list) => (
                 <TableRow key={list.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell align="left">
-                    {`${list.subscriber.user_subscriber.first_name} ${list.subscriber.user_subscriber.last_name}`}
+                    <Link onClick={()=> selectSub(list.subscriber_id)}>{`${list.subscriber.user_subscriber.first_name} ${list.subscriber.user_subscriber.last_name}`}</Link>
                     <Typography variant="body2" sx={{color: 'gray'}}>{list.subscriber.account_no}</Typography>
                   </TableCell>
                   <TableCell align="left">{`${list.month} ${list.year}`}</TableCell>
